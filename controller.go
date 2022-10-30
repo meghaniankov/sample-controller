@@ -237,6 +237,8 @@ func (c *Controller) processNextWorkItem() bool {
 	return true
 }
 
+// BOOKMARKED
+
 // syncHandler compares the actual state with the desired, and attempts to
 // converge the two. It then updates the Status block of the Foo resource
 // with the current status of the resource.
@@ -392,7 +394,13 @@ func newDeployment(foo *samplev1alpha1.Foo) *appsv1.Deployment {
 	labels := map[string]string{
 		"app":        "nginx",
 		"controller": foo.Name,
+		"newlabel": "label1",
 	}
+
+	annotations := map[string]string{
+		"owner": "owner2",
+	}
+
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      foo.Spec.DeploymentName,
@@ -400,6 +408,7 @@ func newDeployment(foo *samplev1alpha1.Foo) *appsv1.Deployment {
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(foo, samplev1alpha1.SchemeGroupVersion.WithKind("Foo")),
 			},
+			Annotations: annotations,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: foo.Spec.Replicas,
@@ -409,6 +418,7 @@ func newDeployment(foo *samplev1alpha1.Foo) *appsv1.Deployment {
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
+					Annotations: annotations,
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
